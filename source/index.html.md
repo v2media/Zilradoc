@@ -2,238 +2,94 @@
 title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
+  - code
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
 
 includes:
-  - errors
 
 search: true
 ---
 
-# Introduction
+# What is a webhook?
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+A webhook is the act of Zilra making an HTTP POST request a <b>Return URL</b> you have provided when an event occurs. This way Zilra is able to immediately notify you when an event occurs 
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+# Protecting your webhook
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+For Zilra to communicate with your application, you will need a publicly accessible URL. You’ll want to protect this URL so that malicious actors cannot manipulate your data. You can add this link to your account by going to the ‘Product’ section under ‘Settings’
 
-# Authentication
 
-> To authorize, use this code:
+# Authentication (Optional)
 
-```ruby
-require 'kittn'
+An easy way to protect your API is through basic HTTP authentication. Almost all web servers can be configured to require a user name and password for access to a URL. You can configure your webhook URL with basic HTTP authentication by adding the user name and password to the URL https://example.com/webhook in the following format and setting the result as the webhook
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+Example URL - https://&lt;username&gt;:&lt;password&gt;@example.com/webhook
+
+# What is Product Webhook?
+
+> Return
+
+```code
+(
+    [order_date] => 2020-03-09
+    [order_no] => a30d51
+    [mode_of_payment] => Card
+    [last4] => 1111
+    [order_amount] => 30.00
+    [order_transaction_id] => b7de8b5a
+    [email_address] => senthil.kumaran@n-frames.com
+    [customer_name] => Senthil Kumaran
+    [order_quantity] => 3
+    [customer_message] => This is testing message
+    [recurring] => Yes
+    [recurring_cycle] => Monthly
+)
 ```
 
-```python
-import kittn
+The Product webhook is a way for Zilra to notify your application that a product has been purchased successfully. This can be useful in a variety of situations, one of the most common use case being giving access instant access to customers for their purchase / subscription / account.
 
-api = kittn.authorize('meowmeowmeow')
-```
-
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
+In Zilra, a product is considered as purchased successfully when the payment processing either through Online Banking or Credit/ Debit Card returns a positive response. When that happens, Zilra marks the particular sale as complete. At the same time, if the webhook is enabled, a hook is posted to your <b>Return URL</b>.
+### API Reference
+Property name | Type | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+order_date | Integer | Time at which the object was created. Measured in seconds since the Unix epoch. 
+order_no | String | Unique identified for the order
+mode_of_payment | String | The payment mode used by the customer to complete the order. (Card or Bank)
+last4 | Integer | The last four digits of the card or the bank account number
+order_amount | Integer | amount collected for this particular order
+order_transaction_id | String | Unique identified for every transaction in an account
+email_address | String | The email address of the customer placing the order
+customer_name | String | The customer’s full name or business name provided at the time of purchase
+order_quantity | Integer | The total number of items purchased by the customer in the particular order
+customer_message | String (Optional) | A message / order note provided by the customer at the time of placing the order
+recurring | Boolean | If the order placed is a subscription agreed by the customer to be charged on the same payment instrument for the same payment amount at an agreed interval.
+recurring_cycle | String | The agreed upon interval at which the customer’s payment instrument will be charged automatically.
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
+# Metered Billing
 
-## Get a Specific Kitten
+This is a simplified version of metered billing useful in cases where you want to charge your customers the same amount as their standard monthly subscription fee when your system identifies their consumption being high and possible termination of their access before the completion of the billing period.
 
-```ruby
-require 'kittn'
+For example, if you are running a SaaS business that sells a certain number of API call for every package, you identify a customer’s account running low on API Call Credits, you then use Metered Billing to automatically charge them a renewal fee and replenish their account with additional to keep their business going.
+  
+## Charging on Metered Billing
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
+> URL
+
+```code
+https://www.zilra.co/product-api/{apikey}/{secretkey}/{orderno}
 ```
 
-```python
-import kittn
+> Example:
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
+```code
+https://www.zilra.co/product-api/msjwrm7o4Wke/d55aae5fed7d888311c3/a30d51
 ```
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
+>Response - A response as per our ‘Product Webhook’ will be posted to the Return URL you have set in your ‘Product’ settings page.
 
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
+Name | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
+apikey | When logged into Zilra, select ‘Settings’ then scroll down to ‘Product’, scroll down to ‘Production Credentials’ and there you will find your API Key.
+secretkey | When logged into Zilra, select ‘Settings’ then scroll down to ‘Product’, scroll down to ‘Production Credentials’ and then click on ‘Show Secret Key’ to see your Secret Key
+orderno | Find the order for which you want to charge the customer, use the unique order number. This will work only for order numbers provided for ‘Subscription’ products.
