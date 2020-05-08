@@ -32,18 +32,19 @@ Example URL - https://&lt;username&gt;:&lt;password&gt;@example.com/webhook
 
 ```code
 (
-    [order_date] => 2020-03-09
+    [order_date] => 1587641497
     [order_no] => a30d51
     [mode_of_payment] => Card
     [last4] => 1111
     [order_amount] => 30.00
     [order_transaction_id] => b7de8b5a
-    [email_address] => senthil.kumaran@n-frames.com
-    [customer_name] => Senthil Kumaran
+    [email_address] => customeremailaddress@domain.com
+    [customer_name] => First Name Last Name
     [order_quantity] => 3
-    [customer_message] => This is testing message
-    [recurring] => Yes
+    [customer_message] => This is message from your customer to you
+    [recurring] => true
     [recurring_cycle] => Monthly
+    [note] => UniqueCodeFromYourBusiness
 )
 ```
 
@@ -65,7 +66,7 @@ order_quantity | Integer | The total number of items purchased by the customer i
 customer_message | String (Optional) | A message / order note provided by the customer at the time of placing the order
 recurring | Boolean | If the order placed is a subscription agreed by the customer to be charged on the same payment instrument for the same payment amount at an agreed interval.
 recurring_cycle | String | The agreed upon interval at which the customer’s payment instrument will be charged automatically.
-
+note | String (Optional) | A message / order note / ID provided by you at the time of redirecting customers to Zilra to identify this specific order on completion.
 # Metered Billing
 
 This is a simplified version of metered billing useful in cases where you want to charge your customers the same amount as their standard monthly subscription fee when your system identifies their consumption being high and possible termination of their access before the completion of the billing period.
