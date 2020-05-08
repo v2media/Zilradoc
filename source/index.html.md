@@ -66,11 +66,7 @@ order_quantity | Integer | The total number of items purchased by the customer i
 customer_message | String (Optional) | A message / order note provided by the customer at the time of placing the order
 recurring | Boolean | If the order placed is a subscription agreed by the customer to be charged on the same payment instrument for the same payment amount at an agreed interval.
 recurring_cycle | String | The agreed upon interval at which the customer’s payment instrument will be charged automatically.
-<<<<<<< HEAD
 note | String (Optional) | A message / order note / ID provided by you at the time of redirecting customers to Zilra to identify this specific order on completion.
-=======
->>>>>>> 34c91cba81a228e00635e6d110a72586de690730
-
 # Metered Billing
 
 This is a simplified version of metered billing useful in cases where you want to charge your customers the same amount as their standard monthly subscription fee when your system identifies their consumption being high and possible termination of their access before the completion of the billing period.
